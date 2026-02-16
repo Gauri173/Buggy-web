@@ -17,7 +17,6 @@
             color: #333;
         }
 
-        /* Timer */
         .timer-banner {
             background: linear-gradient(135deg, #f4e5c2 0%, #e8d4a0 100%);
             color: #5a4a2f;
@@ -43,8 +42,7 @@
             50% { transform: scale(1.05); }
         }
 
-        /* Header */
-        header {
+            header {
             background-color: #ffffff;
             color: #1a1a1a;
             padding: 25px 0;
@@ -158,7 +156,7 @@
             box-shadow: 0 2px 8px rgba(212, 175, 100, 0.3);
         }
 
-        /* Banner */
+        
         .banner {
             background: linear-gradient(135deg, #f9f3e6 0%, #f4e5c2 50%, #ede0c8 100%);
             color: #5a4a2f;
@@ -195,7 +193,6 @@
             color: #6b5a3d;
         }
 
-        /* Filters */
         .filters {
             max-width: 1400px;
             margin: 40px auto;
@@ -234,8 +231,6 @@
             box-shadow: 0 4px 12px rgba(212, 175, 100, 0.3);
             border-color: #c9a961;
         }
-
-        /* Products Grid - BUG: Overlapping items */
         .products-container {
             max-width: 1400px;
             margin: 0 auto;
@@ -309,7 +304,6 @@
             margin-bottom: 15px;
         }
 
-        /* BUG 2 (MEDIUM): Add to Cart Button disabled */
         .add-to-cart {
             width: 100%;
             padding: 12px;
@@ -331,8 +325,6 @@
             box-shadow: 0 5px 15px rgba(212, 175, 100, 0.3);
             background: linear-gradient(135deg, #c9a961 0%, #b89654 100%);
         }
-
-        /* BUG: Modal that doesn't close properly */
         .modal {
             display: none;
             position: fixed;
@@ -371,13 +363,10 @@
         .close:hover {
             color: #a88a4d;
         }
-
-        /* BUG: Broken filter functionality */
         .hidden {
             display: none !important;
         }
 
-        /* Footer */
         footer {
             background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
             color: #f5f0e6;
@@ -392,15 +381,12 @@
             opacity: 0.9;
         }
 
-        /* BUG: Images don't load */
         .product-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* BUG: Wrong image paths */
         }
 
-        /* Notification */
         .notification {
             position: fixed;
             top: 120px;
@@ -425,8 +411,6 @@
                 transform: translateX(0);
             }
         }
-
-        /* BUG: Price sorting doesn't work */
         .sort-dropdown {
             padding: 12px 20px;
             border-radius: 30px;
@@ -454,12 +438,10 @@
     </style>
 </head>
 <body>
-    <!-- Timer Banner -->
-    <div class="timer-banner">
+   <div class="timer-banner">
         <span class="timer-text">⏰ Time Remaining: <span id="timer">30:00</span></span>
     </div>
 
-    <!-- Header -->
     <header>
         <div class="header-content">
             <div class="logo">
@@ -551,7 +533,6 @@
     </footer>
 
     <script>
-        // Timer functionality
         let timeRemaining = 0; // BUG 1 (EASY): Starts at 0 instead of 30*60
         
         function updateTimer() {
@@ -560,13 +541,10 @@
             document.getElementById('timer').textContent = 
                 `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             
-            // BUG 1 (EASY): Increments instead of decrements - timer counts UP!
-            timeRemaining++;
+        
         }
         
         const timerInterval = setInterval(updateTimer, 1000);
-
-        // Products data
         const products = [
             {id: 1, name: 'Diamond Solitaire Ring', price: 45000, category: 'ring', type: 'diamond', emoji: '💍'},
             {id: 2, name: 'Gold Chain Necklace', price: 32000, category: 'necklace', type: 'gold', emoji: '📿'},
@@ -579,7 +557,6 @@
         let cart = [];
         let currentFilter = 'all';
 
-        // Render products
         function renderProducts() {
             const grid = document.getElementById('productsGrid');
             grid.innerHTML = '';
@@ -610,8 +587,6 @@
                 grid.appendChild(card);
             });
         }
-
-        // BUG 3 (MEDIUM): Filter function hides all products when 'all' is selected
         function filterProducts(filter) {
             currentFilter = filter;
             const cards = document.querySelectorAll('.product-card');
@@ -629,15 +604,12 @@
             });
         }
 
-        // BUG 4 (HARD): Async sort with race condition and array mutation causing UI corruption
         let isSorting = false;
         
         async function sortProducts(sortBy) {
             if (!sortBy) return;
             
-            // BUG 4 (HARD): No debouncing - rapid clicks cause race conditions
             if (isSorting) {
-                // BUG 4 (HARD): Multiple simultaneous sorts corrupt the products array
                 console.log('Already sorting, but continuing anyway...');
             }
             
@@ -645,23 +617,18 @@
             
             const grid = document.getElementById('productsGrid');
             const cards = Array.from(grid.querySelectorAll('.product-card'));
-            
-            // BUG 4 (HARD): Simulate async fetch that takes time (like loading from API)
+        
             await new Promise(resolve => setTimeout(resolve, 150));
             
-            // BUG 4 (HARD): Directly mutating the global products array with wrong indices
-            // This corrupts the data because card index !== product index after filtering
             cards.forEach((card, index) => {
                 const productName = card.querySelector('.product-name').textContent;
                 const product = products.find(p => p.name === productName);
                 
                 if (product && index < products.length) {
-                    // BUG 4 (HARD): Overwriting products at wrong indices!
                     products[index] = product; // This scrambles the array!
                 }
             });
-            
-            // BUG 4 (HARD): Now sorting the corrupted products array
+        
             products.sort((a, b) => {
                 if (!a || !b) return 0; // BUG 4 (HARD): Undefined products from corruption
                 
@@ -676,21 +643,16 @@
                         return 0;
                 }
             });
-            
-            // BUG 4 (HARD): Re-rendering with corrupted data causes products to disappear/duplicate
             renderProducts();
-            
-            // BUG 4 (HARD): If filter was active, it's now lost due to re-render
             if (currentFilter !== 'all') {
                 filterProducts(currentFilter); // Try to reapply but data is already corrupted
             }
             
             isSorting = false;
             
-            // BUG 4 (HARD): Rapid clicks will cause multiple corruptions, eventually breaking the UI
+            
         }
 
-        // BUG: Add to cart doesn't work (button is disabled)
         function addToCart(productId) {
             const product = products.find(p => p.id === productId);
             cart.push(product);
@@ -730,8 +692,6 @@
             `;
             modal.style.display = 'block';
         }
-
-        // FIXED: Modal closes properly
         function closeModal() {
             const modal = document.getElementById('productModal');
             modal.style.display = 'none'; // FIXED: Actually close the modal
@@ -754,39 +714,28 @@
             cartContent += `\nTotal: ₹${total.toLocaleString()}`;
             alert(cartContent);
         }
-
-        // BUG 5 (HARD): Async search with memory leak, incorrect debouncing, and state corruption
         let searchTimeout;
         let searchCache = {}; // BUG 5 (HARD): Cache never clears - memory leak!
         let activeSearches = 0; // BUG 5 (HARD): Counter for tracking searches
         
         document.getElementById('searchBox').addEventListener('input', async function(e) {
             const searchTerm = e.target.value.toLowerCase();
-            
-            // BUG 5 (HARD): Debounce implementation is broken - doesn't cancel previous operations
-            if (searchTimeout) {
+                        if (searchTimeout) {
                 clearTimeout(searchTimeout);
-                // BUG 5 (HARD): We clear timeout but don't stop the async operation already in progress!
-            }
+                        }
             
             searchTimeout = setTimeout(async () => {
-                activeSearches++; // BUG 5 (HARD): Increment but never decrement properly
-                
-                // BUG 5 (HARD): Check cache but never invalidate it
+                activeSearches++;
                 if (searchCache[searchTerm]) {
                     console.log('Using cached results for:', searchTerm);
-                    // BUG 5 (HARD): Using stale cache even after products array changes from sorting
                     applySearch(searchCache[searchTerm]);
                     return;
                 }
-                
-                // BUG 5 (HARD): Simulate async search (like API call) that takes time
-                await new Promise(resolve => setTimeout(resolve, 200));
+                                await new Promise(resolve => setTimeout(resolve, 200));
                 
                 const cards = document.querySelectorAll('.product-card');
                 const matchingCards = [];
                 
-                // BUG 5 (HARD): Search logic has off-by-one error and mutates wrong elements
                 cards.forEach((card, index) => {
                     const productName = card.querySelector('.product-name')?.textContent.toLowerCase();
                     
@@ -794,9 +743,7 @@
                         matchingCards.push(card);
                     }
                     
-                    // BUG 5 (HARD): Modifying card attributes incorrectly during iteration
                     if (index > 0) {
-                        // BUG 5 (HARD): Setting previous card's visibility based on current match!
                         const prevCard = cards[index - 1];
                         if (productName && productName.includes(searchTerm)) {
                             prevCard.classList.remove('hidden');
@@ -806,18 +753,14 @@
                     }
                 });
                 
-                // BUG 5 (HARD): Store in cache which will become stale
                 searchCache[searchTerm] = matchingCards;
                 
-                // BUG 5 (HARD): If multiple searches are running, the last one to finish wins
-                // but they all modify the DOM causing flickering and wrong results
                 if (activeSearches > 1) {
                     console.log('Race condition! Multiple searches running:', activeSearches);
                 }
                 
                 applySearch(matchingCards);
                 
-                // BUG 5 (HARD): Decrement happens but might be out of sync
                 activeSearches--;
                 
             }, 300); // 300ms debounce but operations still race
@@ -825,9 +768,7 @@
         
         function applySearch(matchingCards) {
             const allCards = document.querySelectorAll('.product-card');
-            
-            // BUG 5 (HARD): This logic is inverted for some cards
-            allCards.forEach((card, index) => {
+                        allCards.forEach((card, index) => {
                 if (matchingCards.includes(card)) {
                     if (index % 2 === 0) { // BUG 5 (HARD): Arbitrary condition causes wrong results
                         card.classList.remove('hidden');
@@ -840,7 +781,6 @@
             });
         }
 
-        // Modal close when clicking outside
         window.onclick = function(event) {
             const modal = document.getElementById('productModal');
             if (event.target == modal) {
@@ -848,8 +788,6 @@
                 closeModal();
             }
         }
-
-        // Initialize
         renderProducts();
     </script>
 </body>
